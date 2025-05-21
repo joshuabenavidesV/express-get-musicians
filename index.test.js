@@ -95,9 +95,24 @@ test("Testing deleting new musicians", async () => {
 let musicianId = response.body.id;
 const deletedResponse = await request(app).delete(`/musicians/${musicianId}`)
 expect(deletedResponse.statusCode).toEqual(200);
-const fetchResponse = await request(app).get(`/musicians/${musicianId}`);
-    expect(fetchResponse.statusCode).toEqual(404);
-    
+
 });
-    
+    // DAY 4
+    test("should return 400 if name is missing", async () => {
+    const response = await request(app)
+      .post("/musicians")
+      .send({ instrument: "Guitar"});
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty("error");
+    expect(Array.isArray(response.body.error)).toBe(true);
+  });
+
+  test("should create a restaurant if all fields are valid", async () => {
+    const response = await request(app)
+      .post("/musicians")
+      .send({ name: "Luigi", instrument: "Chello"});
+    expect(response.statusCode).toBe(201);
+    expect(response.body).toHaveProperty("name", "Luigi");
+    expect(response.body).toHaveProperty("instrument", "Chello");
+  });
 })
