@@ -74,6 +74,7 @@ test("Testing updating new musicians", async () => {
         .send(newMusician);
     let musicianId = response.body.id;
     let updatedMusician = {
+        name:"jeff",
         instrument: 'Bass'
     }
     let updatedResponse = await request(app)
@@ -115,4 +116,27 @@ expect(deletedResponse.statusCode).toEqual(200);
     expect(response.body).toHaveProperty("name", "Luigi");
     expect(response.body).toHaveProperty("instrument", "Chello");
   });
-})
+
+  test("returns 400 if name is too short", async () => {
+  const response = await request(app)
+    .put(`/musicians/1`)
+    .send({ name: "B", instrument: "Guitar" });
+  expect(response.status).toBe(400);
+  expect(response.body).toHaveProperty("error");
+});
+
+ test("updates musician successfully with valid data", async () => {
+  const newMusician = await request(app)
+    .post("/musicians")
+    .send({ name: "JIM", instrument: "Guitar" });
+  const id = newMusician.body.id;
+  const response = await request(app)
+    .put(`/musicians/${id}`)
+    .send({ name: "Jimmy", instrument: "Bass" });
+
+  expect(response.status).toBe(200);
+  expect(response.body).toHaveProperty("name", "Jimmy");
+  expect(response.body).toHaveProperty("instrument", "Bass");
+});
+});
+

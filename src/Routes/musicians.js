@@ -15,7 +15,8 @@ musiciansRouter.get("/:id", async (request, response) => {
   });
 
 // Creates
-musiciansRouter.post("/",[check("name").not().isEmpty().trim(), check("instrument").not().isEmpty().trim()], async (request, response) => {
+musiciansRouter.post("/",[check("name").not().isEmpty().trim(), check("name").isLength({ min: 2, max: 20 }), check("instrument").not().isEmpty().trim(), 
+  check("instrument").isLength({ min: 2, max: 20 }),], async (request, response) => {
   const errors = validationResult(request);
   if (!errors.isEmpty()) {
       return response.status(400).json({ error: errors.array() });
@@ -30,10 +31,16 @@ musiciansRouter.delete("/:id", async (request, response) => {
     response.json({ message: "Musician has been deleted" });
 });
 //Modifies, updates
-musiciansRouter.put("/:id", async (request, response) => {
+musiciansRouter.put("/:id", [check("name").not().isEmpty().trim(), check("name").isLength({ min: 2, max: 20 }), check("instrument").not().isEmpty().trim(), 
+  check("instrument").isLength({ min: 2, max: 20 }),], async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+      return response.status(400).json({ error: errors.array() });
+    } else {
   const [updatedRows] = await Musician.update(request.body, { where: { id: request.params.id } });
     const updatedMusician = await Musician.findByPk(request.params.id);
     response.json(updatedMusician);
+    }
 });
 
 module.exports= musiciansRouter;
